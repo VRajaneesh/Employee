@@ -1,0 +1,11 @@
+<mat-card class="delete-dialog-card">
+  <div class="delete-dialog-content">
+    <div class="delete-dialog-message">
+      Would you like to delete <span class="delete-dialog-filename">{{data.filename}}</span>?
+    </div>
+    <div class="delete-dialog-actions">
+      <button mat-raised-button color="primary" (click)="onCancel()">No</button>
+      <button mat-raised-button color="warn" (click)="onConfirm()" cdkFocusInitial>Ok</button>
+    </div>
+  </div>
+</mat-card>

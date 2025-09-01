@@ -1,0 +1,22 @@
+<div class="login-container">
+  <h2>Login</h2>
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" autocomplete="off">
+    <mat-form-field appearance="outline" class="app-form-field">
+      <mat-icon matPrefix>person</mat-icon>
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" autocomplete="username" />
+      <mat-error *ngIf="loginForm.get('email')?.invalid">Valid email required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="app-form-field">
+      <mat-icon matPrefix>lock</mat-icon>
+      <mat-label>Password</mat-label>
+      <input matInput formControlName="password" type="password" autocomplete="current-password" />
+      <mat-error *ngIf="loginForm.get('password')?.invalid">Password required</mat-error>
+    </mat-form-field>
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="loading">Login</button>
+      <button mat-stroked-button color="accent" type="button" (click)="onRegister()">Register</button>
+    </div>
+    <mat-progress-spinner *ngIf="loading" diameter="24"></mat-progress-spinner>
+  </form>
+</div>

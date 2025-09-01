@@ -1,0 +1,70 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* You can add global styles to this file, and also import other style files */
+
+/* Responsive Material Card for Employee List */
+@media (max-width: 1200px) {
+  mat-card {
+    max-width: 98vw !important;
+    padding: 16px !important;
+  }
+}
+@media (max-width: 800px) {
+  mat-card {
+    max-width: 100vw !important;
+    padding: 8px !important;
+    border-radius: 8px !important;
+  }
+  h2 {
+    font-size: 1.3rem !important;
+  }
+  .mat-form-field {
+    max-width: 100vw !important;
+  }
+  table {
+    font-size: 0.95rem !important;
+  }
+}
+@media (max-width: 600px) {
+  mat-card {
+    max-width: 100vw !important;
+    padding: 4px !important;
+    border-radius: 4px !important;
+  }
+  h2 {
+    font-size: 1.1rem !important;
+  }
+  .mat-form-field {
+    max-width: 100vw !important;
+  }
+  table {
+    font-size: 0.85rem !important;
+  }
+  .mat-header-cell, .mat-cell {
+    padding: 4px !important;
+  }
+}
+/* Responsive form card */
+@media (max-width: 600px) {
+  mat-card {
+    max-width: 100vw !important;
+    padding: 4px !important;
+  }
+  form {
+    margin-top: 8px !important;
+  }
+  .mat-form-field {
+    margin-bottom: 8px !important;
+  }
+  button {
+    min-width: 80px !important;
+    font-size: 0.95rem !important;
+  }
+}
+/* Ensure table scrolls horizontally on small screens */
+div[style*="overflow-x: auto"] {
+  overflow-x: auto !important;
+}
+table {
+  min-width: 600px;
+}

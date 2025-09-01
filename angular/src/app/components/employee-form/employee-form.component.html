@@ -1,0 +1,40 @@
+<mat-card class="mat-elevation-z8 employee-form-card">
+  <div class="employee-form-header">
+    <mat-icon class="employee-form-icon">person</mat-icon>
+    <h2 class="employee-form-title">Add / Edit Employee</h2>
+    <span class="employee-form-desc">Fill out the details below</span>
+  </div>
+  <mat-divider></mat-divider>
+  <form (ngSubmit)="onSubmit()" #employeeForm="ngForm" class="employee-form">
+    <mat-form-field appearance="outline" class="employee-form-field">
+      <mat-icon matPrefix>badge</mat-icon>
+      <mat-label>Name</mat-label>
+      <input matInput [(ngModel)]="employee.name" name="name" required autocomplete="off">
+      <mat-error *ngIf="employeeForm.form.controls['name']?.invalid">Name is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="employee-form-field">
+      <mat-icon matPrefix>email</mat-icon>
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="employee.email" name="email" required email autocomplete="off">
+      <mat-error *ngIf="employeeForm.form.controls['email']?.invalid">Valid email is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="employee-form-field">
+      <mat-icon matPrefix>business</mat-icon>
+      <mat-label>Department</mat-label>
+      <input matInput [(ngModel)]="employee.department" name="department" required autocomplete="off">
+      <mat-error *ngIf="employeeForm.form.controls['department']?.invalid">Department is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="employee-form-field">
+      <mat-icon matPrefix>call</mat-icon>
+      <mat-label>Phone</mat-label>
+      <input matInput [(ngModel)]="employee.phone" name="phone" required maxlength="10" minlength="10" pattern="^[0-9]{10}$" type="tel" autocomplete="off">
+      <mat-error *ngIf="employeeForm.form.controls['phone']?.invalid || employee.phone.length !== 10">
+        Phone must be exactly 10 digits
+      </mat-error>
+    </mat-form-field>
+    <div class="employee-form-actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="isSubmitting">Save</button>
+      <button mat-stroked-button color="warn" type="button" (click)="cancel()">Cancel</button>
+    </div>
+  </form>
+</mat-card>

@@ -1,0 +1,39 @@
+# Node.js
+node_modules/
+dist/
+.env
+.env.*
+
+# Angular
+.angular/
+coverage/
+
+# Python
+__pycache__/
+*.pyc
+instance/
+.env
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# Test results
+test-results/
+
+# Misc
+*.swp
+*.swo
+
+# Ignore local settings
+local_settings.py
