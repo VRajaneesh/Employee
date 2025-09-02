@@ -21,4 +21,9 @@ export class HeaderComponent {
       this.router.navigate(['/login']);
     });
   }
+
+  showLogout(): boolean {
+    const hiddenRoutes = ['/login', '/register', '/forgot-password'];
+    return !hiddenRoutes.includes(this.router.url);
+  }
 }

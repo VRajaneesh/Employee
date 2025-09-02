@@ -16,6 +16,7 @@
     <div class="form-actions">
       <button mat-raised-button color="primary" type="submit" [disabled]="loading">Login</button>
       <button mat-stroked-button color="accent" type="button" (click)="onRegister()">Register</button>
+      <button mat-button type="button" class="forgot-password-link" (click)="onForgotPassword()">Forgot Password?</button>
     </div>
     <mat-progress-spinner *ngIf="loading" diameter="24"></mat-progress-spinner>
   </form>

@@ -15,6 +15,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 import jwt as pyjwt
 from datetime import datetime, timedelta, timezone
+import secrets
 
 app = Flask(__name__)
 # Enable CORS for cross-origin requests from frontend
@@ -271,6 +272,24 @@ def logout():
     """
     # For demo: just return success (session/cookie handling can be added)
     return jsonify({'message': 'Logout successful'}), 200
+
+@app.route('/password-reset-request', methods=['POST'])
+def password_reset_request():
+    """
+    Handle password reset requests.
+    Expects: { "email": "user@example.com" }
+    Returns: Success message (simulate sending email for now)
+    """
+    data = request.get_json()
+    email = data.get('email')
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+    # Simulate token generation
+    reset_token = secrets.token_urlsafe(32)
+    # Simulate sending email (log to console)
+    print(f"Password reset requested for {email}. Token: {reset_token}")
+    # In real app, store token and send email with reset link
+    return jsonify({'message': 'Password reset email sent', 'token': reset_token}), 200
 
 if __name__ == '__main__':
     """

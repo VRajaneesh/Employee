@@ -3,6 +3,7 @@ import { EmployeeListComponent } from './components/employee-list/employee-list.
 import { EmployeeFormComponent } from './components/employee-form/employee-form.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -13,4 +14,5 @@ export const routes: Routes = [
 	{ path: 'employees/:id', component: EmployeeFormComponent, canActivate: [authGuard] },
 	{ path: 'employee/:id', component: EmployeeFormComponent, canActivate: [authGuard] },
 	{ path: 'add', component: EmployeeFormComponent, canActivate: [authGuard] },
+	{ path: 'forgot-password', component: ForgotPasswordComponent },
 ];

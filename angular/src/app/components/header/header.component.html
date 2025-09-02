@@ -1,5 +1,5 @@
 <mat-toolbar color="primary" class="app-header">
   <!-- <span class="app-title">Employee Directory</span> -->
   <span class="spacer"></span>
-  <button mat-button color="accent" (click)="logout()">Logout</button>
+  <button *ngIf="showLogout()" mat-button color="accent" (click)="logout()">Logout</button>
 </mat-toolbar>
