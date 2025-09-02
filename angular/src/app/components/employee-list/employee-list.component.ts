@@ -32,6 +32,8 @@ import { MatDividerModule } from '@angular/material/divider'; // Material divide
 import { MatCardModule } from '@angular/material/card'; // Material card
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // For confirmation messages
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // For loading spinner
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator'; // For pagination
+  imports: [CommonModule, FormsModule, MatTableModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, MatDialogModule, MatDividerModule, MatCardModule, MatSnackBarModule, MatProgressSpinnerModule, MatPaginatorModule] // Added MatPaginatorModule
 import { DeleteConfirmDialog } from '../delete-confirm-dialog/delete-confirm-dialog.component'; // Confirmation dialog
 
 @Component({
@@ -39,7 +41,7 @@ import { DeleteConfirmDialog } from '../delete-confirm-dialog/delete-confirm-dia
   templateUrl: './employee-list.component.html', // HTML template
   styleUrls: ['./employee-list.component.scss'], // Styles
   standalone: true, // Standalone component
-  imports: [CommonModule, FormsModule, MatTableModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, MatDialogModule, MatDividerModule, MatCardModule, MatSnackBarModule, MatProgressSpinnerModule] // Imported modules
+  imports: [CommonModule, FormsModule, MatTableModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, MatDialogModule, MatDividerModule, MatCardModule, MatSnackBarModule, MatProgressSpinnerModule, MatPaginatorModule] // Imported modules
 })
 export class EmployeeListComponent implements OnInit, AfterViewChecked {
   // List of employees fetched from API
@@ -53,6 +55,7 @@ export class EmployeeListComponent implements OnInit, AfterViewChecked {
   public filterValue: string = '';
   // Reference to MatSort for sorting table
   @ViewChild(MatSort, { static: false }) sort!: MatSort;
+  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator; // Add paginator
 
   // Constructor injects required services
   constructor(
@@ -73,19 +76,15 @@ export class EmployeeListComponent implements OnInit, AfterViewChecked {
   // Called when component initializes
   ngOnInit() {
     this.isLoading = true;
-  // Loader will only close when data is populated
+    // Restore: Fetch real employee data from API
     this.employeeService.getEmployees().subscribe({
       next: (data) => {
-        console.log('API response:', data); // Debug log
         this.employees = data;
-  this.dataSource.data = this.employees;
-  this.isLoading = false; // Loader closes only on success
-  this.cdr.detectChanges(); // Manually trigger change detection
-
+        this.dataSource.data = this.employees;
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('API error:', err); // Debug log
-        // Loader stays open on error
         this.snackBar.open('Error loading employees', 'Close', { duration: 3000 });
       }
     });
@@ -93,10 +92,14 @@ export class EmployeeListComponent implements OnInit, AfterViewChecked {
 
 
   ngAfterViewChecked() {
-    // Assign MatSort after table is rendered
+    // Assign MatSort and MatPaginator after table is rendered
     if (this.sort && this.dataSource.sort !== this.sort) {
       this.dataSource.sort = this.sort;
       console.log('MatSort assigned in ngAfterViewChecked:', this.sort);
+    }
+    if (this.paginator && this.dataSource.paginator !== this.paginator) {
+      this.dataSource.paginator = this.paginator;
+      console.log('MatPaginator assigned in ngAfterViewChecked:', this.paginator);
     }
     if (!this.sort) {
       console.warn('MatSort is still undefined in ngAfterViewChecked!');
