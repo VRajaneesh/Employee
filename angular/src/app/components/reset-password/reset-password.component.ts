@@ -1,6 +1,7 @@
 
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule]
+  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatInputModule]
 })
 export class ResetPasswordComponent {
   resetForm: FormGroup;
