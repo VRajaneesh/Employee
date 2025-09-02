@@ -211,3 +211,48 @@ def test_expired_token_rejected():
         response = client.get("/employees", headers=headers)
         assert response.status_code == 401
         assert "Invalid or expired token" in response.get_json()["error"]
+
+def test_password_reset_valid():
+    """Test /password-reset with valid token and password resets password."""
+    with app.test_client() as client:
+        # Ensure user exists
+        reg_data = {"name": "TestUser", "email": "testuser@example.com", "password": "oldpass123"}
+        client.post("/register", json=reg_data)
+        # Request password reset to get token
+        resp = client.post("/password-reset-request", json={"email": "testuser@example.com"})
+        token = resp.get_json()["token"]
+        data = {"token": token, "password": "newpass456"}
+        response = client.post("/password-reset", json=data)
+        assert response.status_code == 200
+        resp_json = response.get_json()
+        assert "message" in resp_json
+        assert resp_json["message"] == "Password reset successful!"
+
+def test_password_reset_missing_fields():
+    """Test /password-reset with missing token or password returns error."""
+    with app.test_client() as client:
+        response = client.post("/password-reset", json={"token": "sometoken"})
+        assert response.status_code == 400
+        assert "Token and password are required" in response.get_json()["error"]
+        response = client.post("/password-reset", json={"password": "newpass456"})
+        assert response.status_code == 400
+        assert "Token and password are required" in response.get_json()["error"]
+
+def test_password_reset_user_not_found():
+    """Test /password-reset when user does not exist returns error."""
+    with app.test_client() as client:
+        # Delete user if exists
+        from employee_app.app.models.models import User
+        from employee_app.app.models.db import db
+        with app.app_context():
+            user = User.query.filter_by(email="testuser@example.com").first()
+            if user:
+                db.session.delete(user)
+                db.session.commit()
+        # Request password reset to get token
+        resp = client.post("/password-reset-request", json={"email": "testuser@example.com"})
+        token = resp.get_json().get("token", "invalidtoken")
+        data = {"token": token, "password": "newpass456"}
+        response = client.post("/password-reset", json=data)
+    assert response.status_code == 400
+    assert "Invalid or expired token" in response.get_json()["error"]

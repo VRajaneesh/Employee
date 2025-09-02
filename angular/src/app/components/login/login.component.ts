@@ -92,4 +92,9 @@ export class LoginComponent {
   onRegister() {
     this.router.navigate(['/register']);
   }
+
+  onForgotPassword() {
+    // Navigate to a password reset request page (to be implemented)
+    this.router.navigate(['/forgot-password']);
+  }
 }

@@ -84,10 +84,15 @@ curl -X DELETE http://localhost:5000/employees/1
 - Tests use Pytest and a separate in-memory SQLite database for isolation.
 - All API tests use JWT authentication; the test client automatically registers and logs in a test user.
 - Test files are in the `tests/` folder.
-- Run tests:
-  ```powershell
-  $env:PYTHONPATH="."; pytest employee_app/tests
-  ```
+
+## How to Run Backend Tests (Windows)
+
+1. Open PowerShell in the project root (`C:\Users\vasam\Downloads\employee`).
+2. Set the Python path and run tests:
+   ```powershell
+   $env:PYTHONPATH="."; pytest employee_app/tests
+   ```
+3. If you see `ModuleNotFoundError`, check that you are in the correct folder and that `employee_app` is a valid Python package (contains `__init__.py`).
 
 ## How to Run Backend Tests and Generate HTML Report
 

@@ -9,12 +9,14 @@ from flask import Flask, request, jsonify
 import re
 from employee_app.app.models.db import db
 from employee_app.app.models.models import Employee, User
+from employee_app.app.models.reset_token import PasswordResetToken
 from employee_app.app.models.schemas import EmployeeCreateSchema, EmployeeUpdateSchema, UserRegisterSchema, UserLoginSchema
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 import jwt as pyjwt
 from datetime import datetime, timedelta, timezone
+import secrets
 
 app = Flask(__name__)
 # Enable CORS for cross-origin requests from frontend
@@ -272,6 +274,56 @@ def logout():
     # For demo: just return success (session/cookie handling can be added)
     return jsonify({'message': 'Logout successful'}), 200
 
+@app.route('/password-reset-request', methods=['POST'])
+def password_reset_request():
+    """
+    Handle password reset requests.
+    Expects: { "email": "user@example.com" }
+    Returns: Success message (simulate sending email for now)
+    """
+    data = request.get_json()
+    email = data.get('email')
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    # Generate token and expiration
+    reset_token = secrets.token_urlsafe(32)
+    expires_at = datetime.utcnow() + timedelta(hours=1)
+    # Store token in DB
+    token_entry = PasswordResetToken(user_id=user.id, token=reset_token, expires_at=expires_at)
+    db.session.add(token_entry)
+    db.session.commit()
+    # Simulate sending email (log to console)
+    print(f"Password reset requested for {email}. Token: {reset_token}")
+    # In real app, send email with reset link
+    return jsonify({'message': 'Password reset email sent', 'token': reset_token}), 200
+
+@app.route('/password-reset', methods=['POST'])
+def password_reset():
+    """
+    Handle password reset using token and new password.
+    Expects: { "token": "...", "password": "..." }
+    Returns: Success or error message
+    """
+    data = request.get_json()
+    token = data.get('token')
+    password = data.get('password')
+    if not token or not password:
+        return jsonify({'error': 'Token and password are required'}), 400
+    # Lookup token in DB
+    token_entry = PasswordResetToken.query.filter_by(token=token, used=False).first()
+    if not token_entry or not token_entry.is_valid():
+        return jsonify({'error': 'Invalid or expired token'}), 400
+    user = User.query.get(token_entry.user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    user.password_hash = generate_password_hash(password)
+    token_entry.used = True
+    db.session.commit()
+    print(f"Password reset for user {user.email} with token {token}")
+    return jsonify({'message': 'Password reset successful!'}), 200
 if __name__ == '__main__':
     """
     Run the Flask development server.
