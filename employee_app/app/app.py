@@ -13,15 +13,18 @@ from employee_app.app.models.schemas import EmployeeCreateSchema, EmployeeUpdate
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
+from dotenv import load_dotenv
+import os
 import jwt as pyjwt
 from datetime import datetime, timedelta, timezone
 
 app = Flask(__name__)
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 # Enable CORS for cross-origin requests from frontend
 CORS(app)
 # Flask app and database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///employees.db'  # SQLite DB for employees
-app.config['SECRET_KEY'] = 'your_secret_key_here'  # Flask secret key
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///employees.db')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key_here')
 db.init_app(app)  # Initialize SQLAlchemy ORM
 
 """
@@ -30,9 +33,9 @@ JWT_SECRET: Secret key for signing tokens
 JWT_ALGORITHM: Algorithm used for JWT
 JWT_EXP_DELTA_SECONDS: Token expiration time in seconds
 """
-JWT_SECRET = 'your_jwt_secret_key'
+JWT_SECRET = os.environ.get('JWT_SECRET_KEY', 'your-jwt-secret-key')
 JWT_ALGORITHM = 'HS256'
-JWT_EXP_DELTA_SECONDS = 3600
+JWT_EXP_DELTA_SECONDS = int(os.environ.get('JWT_EXP_DELTA_SECONDS', 3600))
 
 # Setup basic logging
 logging.basicConfig(level=logging.INFO)
