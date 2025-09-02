@@ -23,7 +23,9 @@ export class HeaderComponent {
   }
 
   showLogout(): boolean {
-    const hiddenRoutes = ['/login', '/register', '/forgot-password'];
-    return !hiddenRoutes.includes(this.router.url);
+    const hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+    const url = this.router.url || '';
+    const baseUrl = url.split('?')[0];
+    return !hiddenRoutes.includes(baseUrl);
   }
 }
