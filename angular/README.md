@@ -1,5 +1,18 @@
 # Employee Directory Angular Frontend
 
+# Git Instructions
+
+Clone the repository:
+```powershell
+git clone https://github.com/VRajaneesh/Employee.git
+cd Employee/angular
+```
+
+To update your local copy with the latest changes:
+```powershell
+git pull origin main
+```
+
 This is the frontend for the Employee Directory app, built with Angular and Angular Material. It connects to a Flask backend API.
 
 ## Quick Start
@@ -14,11 +27,6 @@ This is the frontend for the Employee Directory app, built with Angular and Angu
    npm start
    ```
    - The app will run at [http://localhost:4200](http://localhost:4200).
-4. **Make sure the backend is running in the `employee` folder:**
-   ```sh
-   python -m employee_app.app.app
-   ```
-   - The backend should run at [http://localhost:5000](http://localhost:5000).
 
 ## How to Run Tests
 
@@ -54,33 +62,68 @@ To generate a detailed HTML test report for your Angular unit tests:
 
 This report will show all test cases, their status, and details for easy review.
 
-## Folder Guide
+### Folder Guide
 
-- `src/app/components/` – All UI components (employee list, form, dialogs, login, register)
-- `src/app/services/` – API and authentication services
-- `src/app/guards/` – Route guards for authentication
-- `src/app/app.module.ts` – Main Angular module
-- `src/app/app-routing.module.ts` – Routing setup
+- `src/app/components/` – All UI components (employee list, forms, dialogs, login, register, password reset)
+- `src/app/services/` – API services (employee, auth), handles HTTP requests
+- `src/app/guards/` – Route guards for authentication and access control
+- `src/app/models/` – TypeScript interfaces and models for employees, users, etc.
+- `src/app/shared/` – Shared modules, pipes, directives, and reusable code
+- `src/app/app.module.ts` – Main Angular module (root of the app)
+- `src/app/app-routing.module.ts` – Routing setup for all pages
+- `src/environments/` – Environment configuration files (API URLs, etc.)
+- `assets/` – Static assets (images, icons, styles)
 - `karma.conf.js` – Test runner configuration
+- `angular.json` – Angular CLI project configuration
+- `package.json` – Project dependencies and scripts
 
 ## What This App Does
 
-- List, add, edit, and delete employees
-- Search, sort, and filter employees
-- Login and register users (JWT authentication)
-- Responsive Material UI
-- Form validation and error messages
-- Confirmation dialogs for delete actions
 
-## Troubleshooting
+The Employee Directory Angular app provides a complete user interface for managing employees and user accounts:
 
-- If you see errors, check that both frontend and backend are running.
-- For test errors, make sure you’re in the `angular` folder and have run `npm install`.
-- For backend errors, check the Flask server in the `employee` folder.
+- **Employee Management:**
+   - List all employees with pagination and search
+   - Add new employees with validation
+   - Edit employee details
+   - Delete employees with confirmation dialogs
+   - View employee details in a dialog or separate page
+   - Filter and sort employees by name, department, etc.
+
+- **User Authentication:**
+   - Register new users
+   - Login with JWT authentication
+   - Logout functionality
+   - Route guards to protect pages for authenticated users
+
+- **Password Management:**
+   - Forgot password workflow (request reset link)
+   - Reset password using token
+
+- **UI/UX:**
+   - Responsive Angular Material design for desktop and mobile
+   - Form validation and clear error messages
+   - Loading indicators and feedback for API actions
+   - Accessible forms and navigation
+
+- **Integration:**
+   - Connects to Flask backend API for all data and authentication
+   - Uses environment configuration for API URLs
+
+- **Testing:**
+   - Unit tests for components and services
+   - HTML test reports (Karma)
+
 
 ## Troubleshooting: Test Report Not Generated
 
 If you run `npx ng test --watch=false` and do not see an HTML report:
+
+**Note:** Make sure you are in the `angular` folder before running the following commands.
+**Command:**  
+ ```sh
+  cd angular
+```
 
 1. **Install the Karma HTML reporter:**
    ```sh
@@ -106,6 +149,15 @@ If you run `npx ng test --watch=false` and do not see an HTML report:
 
 If you still do not see the report, check that the `test-results` folder exists and that your `karma.conf.js` is saved correctly.
 
+## Docker Deployment
+
+Use docker-compose to run both backend and frontend together:
+   ```powershell
+   docker-compose up --build
+   ```
+
+- Frontend will be available at http://localhost:4200
+- See `docker-compose.yml` for details.
+
 ---
 
-This README is designed for anyone, even if you’re new to the project. Follow the steps above to get started quickly.
