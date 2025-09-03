@@ -10,6 +10,9 @@ This is a RESTful backend for the Employee Directory application, built with Fla
 - Sample employee data on first run
 - Pydantic validation for API input data
 - CORS enabled for frontend-backend integration
+- JWT authentication for secure endpoints
+- Password reset and forgot password endpoints
+- Dockerized backend and frontend for easy deployment
 - Comprehensive docstrings and inline documentation for maintainability
 
 ## Tech Stack
@@ -18,61 +21,111 @@ This is a RESTful backend for the Employee Directory application, built with Fla
 - Flask-SQLAlchemy
 - Pydantic
 - SQLite (default)
+- Flask-JWT-Extended (JWT authentication)
+- Flask-CORS (CORS support)
+- Docker & Docker Compose (containerized deployment)
+
+## Git Instructions
+
+Clone the repository:
+```powershell
+git clone https://github.com/VRajaneesh/Employee.git
+cd Employee
+```
+
+To update your local copy with the latest changes:
+```powershell
+git pull origin main
+```
+
 
 ## Setup Instructions
-**Important:** Run all commands from the parent directory (`C:\Users\vasam\Downloads\employee`) for correct imports and module resolution.
+**Important:** Run all commands from the parent directory for correct imports and module resolution.
 1. Clone or download the project.
 2. Open a terminal in the project folder.
-3. Create and activate a virtual environment:
+3. Change directory to the backend folder:
+   ```powershell
+   cd employee_app
+   ```
+4. Create and activate a virtual environment:
    ```powershell
    python -m venv venv
    .\venv\Scripts\activate
    ```
-4. Install dependencies:
+5. Install dependencies:
    ```powershell
    pip install -r requirements.txt
    ```
-5. Run the backend server:
+
+6. Change directory back to the project root:
+   ```powershell
+   cd ..
+   ```
+7. Run the backend server:
    ```powershell
    python -m employee_app.app.app
    ```
 
 ## API Endpoints
-| Method | Endpoint                | Description                |
-|--------|-------------------------|----------------------------|
-| POST   | /register               | Register a new user        |
-| POST   | /login                  | Login and get JWT token    |
-| POST   | /logout                 | Logout (demo endpoint)     |
-| GET    | /employees              | List all employees (JWT required)  |
-| GET    | /employees/<id>         | Get one employee (JWT required)    |
+| Method | Endpoint                | Description                                 |
+|--------|-------------------------|---------------------------------------------|
+| POST   | /register               | Register a new user                         |
+| POST   | /login                  | Login and get JWT token                     |
+| POST   | /logout                 | Logout (demo endpoint)                      |
+| POST   | /forgot-password        | Request password reset link                 |
+| POST   | /reset-password         | Reset password using token                  |
+| GET    | /employees              | List all employees (JWT required)           |
+| GET    | /employees/<id>         | Get one employee (JWT required)             |
 | POST   | /employees              | Create new employee (JWT required, Pydantic validation) |
 | PUT    | /employees/<id>         | Update employee (JWT required, Pydantic validation)     |
-| DELETE | /employees/<id>         | Delete employee (JWT required)    |
+| DELETE | /employees/<id>         | Delete employee (JWT required)              |
 
 ### Example API Calls
-**List employees:**
+
+**Register a new user:**
 ```bash
-curl http://localhost:5000/employees
+curl -X POST -H "Content-Type: application/json" -d '{"email":"user@example.com","password":"yourpassword"}' http://localhost:5000/register
 ```
 
-**Get employee:**
+**Login and get JWT token:**
 ```bash
-curl http://localhost:5000/employees/1
+curl -X POST -H "Content-Type: application/json" -d '{"email":"user@example.com","password":"yourpassword"}' http://localhost:5000/login
 ```
 
-**Create employee:**
-```bash
-curl -X POST -H "Content-Type: application/json" -d '{"name":"John Doe","email":"john@example.com","department":"IT","phone":"1234567890"}' http://localhost:5000/employees
+Assume the login response returns:
+```json
+{
+   "access_token": "<JWT_TOKEN>"
+}
 ```
 
-**Update employee:**
+**List employees (JWT required):**
 ```bash
-curl -X PUT -H "Content-Type: application/json" -d '{"name":"Jane Doe"}' http://localhost:5000/employees/1
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:5000/employees
 ```
 
-**Delete employee:**
+**Get employee (JWT required):**
 ```bash
-curl -X DELETE http://localhost:5000/employees/1
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:5000/employees/1
+```
+
+**Create employee (JWT required):**
+```bash
+curl -X POST -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" \
+   -d '{"name":"John Doe","email":"john@example.com","department":"IT","phone":"1234567890"}' \
+   http://localhost:5000/employees
+```
+
+**Update employee (JWT required):**
+```bash
+curl -X PUT -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" \
+   -d '{"name":"Jane Doe"}' \
+   http://localhost:5000/employees/1
+```
+
+**Delete employee (JWT required):**
+```bash
+curl -X DELETE -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:5000/employees/1
 ```
 
 ## Authentication
@@ -110,17 +163,16 @@ Make sure all dependencies are installed:
 pip install -r employee_app/requirements.txt
 ```
 
-## Troubleshooting
-- If you see database errors, ensure SQLite is accessible and the app has permission to write.
-- For JWT errors, check the token format and expiration.
-- For CORS issues, ensure Flask CORS is enabled and the frontend uses the correct API URL.
-- For validation errors, check Pydantic schema requirements (name, email, department, phone, password).
+## Docker Deployment
 
-## Extensions & Recommendations
-- Add more user roles and permissions for advanced access control.
-- Use environment variables for secret keys and database URIs in production.
-- Add Swagger/OpenAPI documentation for easier API exploration.
-- Consider using Docker for consistent deployment.
+Use docker-compose to run both backend and frontend together:
+```powershell
+docker-compose up --build
+```
+
+- Backend will be available at http://localhost:5000
+- Frontend will be available at http://localhost:4200
+- See `docker-compose.yml` for details.
 
 ---
 
