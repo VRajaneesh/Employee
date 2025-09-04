@@ -22,8 +22,8 @@ from datetime import datetime, timedelta, timezone
 import secrets
 
 app = Flask(__name__)
-# Load environment variables based on FLASK_ENV
-env = os.environ.get('FLASK_ENV', 'development')
+# Load environment variables based on APP_ENV (custom, not deprecated)
+env = os.environ.get('APP_ENV', 'development')
 if env == 'production':
     load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env.prod'))
 else:
