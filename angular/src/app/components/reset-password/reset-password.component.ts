@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-reset-password',
@@ -23,10 +24,11 @@ export class ResetPasswordComponent {
   loading = false;
 
   constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private authService: AuthService
+  private fb: FormBuilder,
+  private route: ActivatedRoute,
+  private router: Router,
+  private authService: AuthService,
+  private snackBar: MatSnackBar
   ) {
     this.resetForm = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -50,10 +52,12 @@ export class ResetPasswordComponent {
     this.authService.resetPassword(this.token, password).subscribe({
       next: (res) => {
         this.success = 'Password reset successful!';
+        this.snackBar.open('Password reset successful!', 'Close', { duration: 3000, panelClass: ['snackbar-success'] });
         setTimeout(() => this.router.navigate(['/login']), 2000);
       },
       error: (err) => {
         this.error = err.error?.error || 'Reset failed.';
+        this.snackBar.open(this.error, 'Close', { duration: 3000, panelClass: ['snackbar-error'] });
         this.loading = false;
       }
     });

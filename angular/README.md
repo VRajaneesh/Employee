@@ -16,6 +16,23 @@ git pull origin main
 This is the frontend for the Employee Directory app, built with Angular and Angular Material. It connects to a Flask backend API.
 
 ## Quick Start
+## Environment Configuration
+
+Angular uses environment files to manage configuration for different environments:
+
+- `src/environments/environment.ts` (development)
+- `src/environments/environment.prod.ts` (production)
+
+**Key variables:**
+
+| Variable | Description                | Example (dev)              | Example (prod)                |
+|----------|----------------------------|----------------------------|-------------------------------|
+| apiUrl   | Backend API base URL       | http://localhost:5000      | https://your-production-api   |
+
+**Best Practices:**
+- Do not hardcode secrets or sensitive values in Angular code.
+- Use environment files for API URLs and config only (never for secrets).
+- Build with `--configuration=production` to use production config.
 
 1. **Open the `angular` folder in your terminal.**
 2. **Install dependencies:**
@@ -30,6 +47,8 @@ This is the frontend for the Employee Directory app, built with Angular and Angu
 
 ## How to Run Tests
 
+- **Open the `angular` folder in your terminal.**
+
 - **Unit tests:**  
   ```sh
   npx ng test --watch=false
@@ -40,6 +59,8 @@ This is the frontend for the Employee Directory app, built with Angular and Angu
 ## Test Reports (HTML)
 
 To generate a detailed HTML test report for your Angular unit tests:
+
+- **Open the `angular` folder in your terminal.**
 
 1. Make sure you have the Karma HTML reporter installed:
    ```sh
@@ -151,9 +172,23 @@ If you still do not see the report, check that the `test-results` folder exists 
 
 ## Docker Deployment
 
+
+You can run the frontend using Docker for easy setup and deployment.
+
 Use docker-compose to run both backend and frontend together:
-   ```powershell
-   docker-compose up --build
+```powershell
+docker-compose up --build -d
+```
+This builds the images and starts all services in the background.
+
+Or, if you want to run the services in the foreground and see the logs directly:
+```powershell
+docker-compose up --build
+```
+
+To stop all running services:
+```powershell
+   docker-compose down
    ```
 
 - Frontend will be available at http://localhost:4200

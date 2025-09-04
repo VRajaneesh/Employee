@@ -15,6 +15,14 @@ This is a RESTful backend for the Employee Directory application, built with Fla
 - Dockerized backend and frontend for easy deployment
 - Comprehensive docstrings and inline documentation for maintainability
 
+## New Features (Week 3)
+- Environment-specific configuration with `.env.dev` and `.env.prod`
+- Secure secret management and `.gitignore` for sensitive files
+- Improved error handling and validation for all endpoints
+- Angular Material UI integration in frontend
+- Docker Compose setup for full-stack deployment
+- Expanded API documentation and example calls
+
 ## Tech Stack
 - Python 3
 - Flask
@@ -40,6 +48,25 @@ git pull origin main
 
 
 ## Setup Instructions
+## Environment Variables
+
+The backend uses environment files to manage configuration for different environments:
+
+- `.env.dev` (development)
+- `.env.prod` (production)
+
+**Required variables:**
+
+| Variable      | Description                       | Example (dev)                | Example (prod)                |
+|--------------|-----------------------------------|------------------------------|-------------------------------|
+| DEBUG        | Enable debug mode                 | True                         | False                         |
+| DATABASE_URL | Database connection string        | sqlite:///dev.db             | postgresql://user:pass@host/db|
+| SECRET_KEY   | Secret key for Flask/JWT          | dev-secret-key               | prod-secret-key               |
+
+**Best Practices:**
+- Do not commit `.env*` files to version control (see `.gitignore`).
+- Set production secrets securely in your deployment environment.
+- Document any additional required variables in this section.
 **Important:** Run all commands from the parent directory for correct imports and module resolution.
 1. Clone or download the project.
 2. Open a terminal in the project folder.
@@ -140,12 +167,11 @@ curl -X DELETE -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:5000/empl
 
 ## How to Run Backend Tests (Windows)
 
-1. Open PowerShell in the project root (`C:\Users\vasam\Downloads\employee`).
+1. Open PowerShell in the project root.
 2. Set the Python path and run tests:
    ```powershell
    $env:PYTHONPATH="."; pytest employee_app/tests
    ```
-3. If you see `ModuleNotFoundError`, check that you are in the correct folder and that `employee_app` is a valid Python package (contains `__init__.py`).
 
 ## How to Run Backend Tests and Generate HTML Report
 
@@ -158,21 +184,34 @@ python -m pytest employee_app/tests --html=report.html
 - The test results will be saved in `report.html` in your project root.
 - Open `report.html` in your browser to view the detailed test report.
 
-Make sure all dependencies are installed:
-```powershell
-pip install -r employee_app/requirements.txt
-```
-
 ## Docker Deployment
 
 Use docker-compose to run both backend and frontend together:
 ```powershell
+docker-compose up --build -d
+```
+This builds the images and starts all services in the background.
+
+Or, if you want to run the services in the foreground and see the logs directly:
+```powershell
 docker-compose up --build
 ```
+
+To stop all running services:
+```powershell
+   docker-compose down
+   ```
 
 - Backend will be available at http://localhost:5000
 - Frontend will be available at http://localhost:4200
 - See `docker-compose.yml` for details.
+
+## Known Issues & Limitations
+
+- SQLite is used for both development and production by default. For production, consider using PostgreSQL or another robust database.
+- Password reset email is simulated (token is printed/logged, not sent).
+- API rate limiting and advanced security features (e.g., HTTPS, CSRF) are not enabled by default.
+- Frontend and backend must be started together for full functionality.
 
 ---
 
