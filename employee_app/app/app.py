@@ -16,17 +16,31 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 from dotenv import load_dotenv
 import os
+
 import jwt as pyjwt
 from datetime import datetime, timedelta, timezone
 import secrets
 
 app = Flask(__name__)
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
+# Load environment variables based on APP_ENV (custom, not deprecated)
+env = os.environ.get('APP_ENV', 'development')
+if env == 'production':
+    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env.prod'))
+else:
+    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env.dev'))
 # Enable CORS for cross-origin requests from frontend
 CORS(app)
 # Flask app and database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///employees.db')
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key_here')
+database_url = os.environ.get('DATABASE_URL')
+secret_key = os.environ.get('SECRET_KEY')
+if env == 'production':
+    if not database_url or not secret_key:
+        raise RuntimeError('DATABASE_URL and SECRET_KEY must be set in production environment!')
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    app.config['SECRET_KEY'] = secret_key
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///employees.db'
+    app.config['SECRET_KEY'] = secret_key or 'your_secret_key_here'
 db.init_app(app)  # Initialize SQLAlchemy ORM
 
 """
