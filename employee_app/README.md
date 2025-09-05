@@ -80,18 +80,44 @@ The backend uses environment files to manage configuration for different environ
 - `.env.dev` (development)
 - `.env.prod` (production)
 
+
 **Required variables:**
 
-| Variable      | Description                       | Example (dev)                | Example (prod)                |
-|--------------|-----------------------------------|------------------------------|-------------------------------|
-| DEBUG        | Enable debug mode                 | True                         | False                         |
-| DATABASE_URL | Database connection string        | sqlite:///dev.db             | postgresql://user:pass@host/db|
-| SECRET_KEY   | Secret key for Flask/JWT          | dev-secret-key               | prod-secret-key               |
+| Variable         | Description                                 | Example (dev)                | Example (prod)                |
+|------------------|---------------------------------------------|------------------------------|-------------------------------|
+| DEBUG            | Enable debug mode                           | True                         | False                         |
+| DATABASE_URL     | Database connection string                  | sqlite:///dev.db             | postgresql://user:pass@host/db|
+| SECRET_KEY       | Secret key for Flask/JWT                    | dev-secret-key               | prod-secret-key               |
+| MAIL_SERVER      | SMTP server for outgoing mail               | smtp.gmail.com               | smtp.gmail.com                |
+| MAIL_PORT        | SMTP port                                   | 587                          | 587                           |
+| MAIL_USE_TLS     | Use TLS for SMTP                            | True                         | True                          |
+| MAIL_USERNAME    | Email address to send from                  | your-email@gmail.com         | your-email@gmail.com          |
+| MAIL_PASSWORD    | App password (Gmail, if 2FA enabled)        | your-app-password            | your-app-password             |
+| MAIL_DEFAULT_SENDER | Default sender address for emails         | your-email@gmail.com         | your-email@gmail.com          |
+
+**Gmail App Password Setup (for 2FA accounts):**
+If you use Gmail and have 2-Step Verification enabled, you must generate an app password for email sending:
+1. Go to your Google Account > Security > App passwords.
+2. Select "Mail" as the app and "Windows Computer" (or "Other") as the device.
+3. Generate and copy the 16-character app password (no spaces).
+4. Set this as `MAIL_PASSWORD` in your `.env.dev` and `.env.prod` files.
+5. Make sure `MAIL_USERNAME` matches the Gmail account for which you generated the app password.
+
+**Example mail config for .env.dev and .env.prod:**
+```
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_DEFAULT_SENDER=your-email@gmail.com
+```
 
 **Best Practices:**
 - Do not commit `.env*` files to version control (see `.gitignore`).
 - Set production secrets securely in your deployment environment.
 - Document any additional required variables in this section.
+
 **Important:** Run all commands from the parent directory for correct imports and module resolution.
 1. Clone or download the project.
 2. Open a terminal in the project folder.

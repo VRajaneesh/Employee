@@ -6,6 +6,7 @@ This file sets up the Flask app, configures the database, registers blueprints, 
 It uses Pydantic for input validation and SQLAlchemy for ORM/database access.
 """
 from flask import Flask, request, jsonify
+from flask_mail import Mail, Message
 import re
 from employee_app.app.models.db import db
 from employee_app.app.models.models import Employee, User
@@ -16,23 +17,47 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 from dotenv import load_dotenv
 import os
-
+from datetime import datetime, timedelta
 import jwt as pyjwt
 from datetime import datetime, timedelta, timezone
 import secrets
 
+"""
+Flask-Mail setup and environment loading
+"""
+mail = Mail()  # Create Flask-Mail instance
 app = Flask(__name__)
 # Load environment variables based on APP_ENV (custom, not deprecated)
 env = os.environ.get('APP_ENV', 'development')
 if env == 'production':
+    # Load production environment variables
     load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env.prod'))
 else:
+    # Load development environment variables
     load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env.dev'))
 # Enable CORS for cross-origin requests from frontend
-CORS(app)
-# Flask app and database configuration
+CORS(app, resources={r"/*": {"origins": ["http://localhost:4200"]}}, supports_credentials=True)
 database_url = os.environ.get('DATABASE_URL')
 secret_key = os.environ.get('SECRET_KEY')
+# Configure mail settings from environment
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True') == 'True'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+# Debug print for mail config (for troubleshooting)
+print("Loaded mail config:")
+for key in ['MAIL_SERVER', 'MAIL_PORT', 'MAIL_USE_TLS', 'MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_DEFAULT_SENDER']:
+    print(f"  {key}: {app.config.get(key)}")
+# Validate mail config and warn if missing
+missing_mail_settings = []
+for key in ['MAIL_SERVER', 'MAIL_PORT', 'MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_DEFAULT_SENDER']:
+    if not app.config.get(key):
+        missing_mail_settings.append(key)
+if missing_mail_settings:
+    logging.warning(f"Missing mail settings: {', '.join(missing_mail_settings)}. Password reset emails may not work.")
+mail.init_app(app)  # Initialize Flask-Mail with app
 if env == 'production':
     if not database_url or not secret_key:
         raise RuntimeError('DATABASE_URL and SECRET_KEY must be set in production environment!')
@@ -42,6 +67,40 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///employees.db'
     app.config['SECRET_KEY'] = secret_key or 'your_secret_key_here'
 db.init_app(app)  # Initialize SQLAlchemy ORM
+
+# Password reset request endpoint (sends email to user)
+@app.route('/password-reset-request', methods=['POST'])
+def password_reset_request():
+    try:
+        email = request.json.get('email')  # Get email from request
+        user = User.query.filter_by(email=email).first()  # Find user by email
+        if not user:
+            return jsonify({'error': 'No user found with that email'}), 404
+        # Generate secure token for password reset
+        token = secrets.token_urlsafe(32)
+        # Save token and expiration to DB
+        expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+        reset_token = PasswordResetToken(user_id=user.id, token=token, expires_at=expires_at)
+        db.session.add(reset_token)
+        db.session.commit()
+        # Build password reset link for frontend using FRONTEND_URL from environment
+        frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:4200')
+        reset_link = f"{frontend_url}/reset-password?token={token}"
+        # Create and send email message
+        msg = Message('Password Reset Request', recipients=[email])
+        msg.body = (
+            f"Hello {user.name},\n\n"
+            f"We received a request to reset your password for your Employee Directory account.\n\n"
+            f"To reset your password, please click the link below or copy and paste it into your browser:\n\n"
+            f"{reset_link}\n\n"
+            f"If you did not request a password reset, please ignore this email.\n\n"
+            f"Thank you,\nEmployee Directory Team"
+        )
+        mail.send(msg)
+        return jsonify({'message': 'Password reset email sent!', 'token': token})
+    except Exception as e:
+        logging.error(f"Password reset error: {e}")
+        return jsonify({'error': 'Internal server error', 'details': str(e)}), 500
 
 """
 JWT configuration
@@ -311,18 +370,6 @@ def logout():
     # For demo: just return success (session/cookie handling can be added)
     return jsonify({'message': 'Logout successful'}), 200
 
-@app.route('/password-reset-request', methods=['POST'])
-def password_reset_request():
-    """
-    Handle password reset requests.
-    Expects: { "email": "user@example.com" }
-    Returns: Success message (simulate sending email for now)
-    """
-    data = request.get_json()
-    email = data.get('email')
-    if not email:
-        return jsonify({'error': 'Email is required'}), 400
-    user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
     # Generate token and expiration
