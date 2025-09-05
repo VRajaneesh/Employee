@@ -7,6 +7,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
+import { fakeAsync, tick } from '@angular/core/testing';
 
 // Mock services
 const mockEmployees = [
@@ -34,7 +35,6 @@ class MockMatSnackBar {
 }
 
 class MockDeleteConfirmDialog {}
-import { fakeAsync, tick } from '@angular/core/testing';
 
 describe('EmployeeListComponent', () => {
   let component: EmployeeListComponent;

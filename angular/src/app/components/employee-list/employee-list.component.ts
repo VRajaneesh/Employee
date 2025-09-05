@@ -18,7 +18,6 @@
  * - deleteEmployee(emp): Confirms and deletes the selected employee
  */
 import { Component, OnInit, ChangeDetectorRef, ViewChild, AfterViewChecked } from '@angular/core'; // Angular core imports
-import { ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router'; // For navigation
 import { EmployeeService } from '../../services/employee.service'; // Service for API calls
 import { CommonModule } from '@angular/common'; // Common Angular directives
@@ -41,8 +40,6 @@ import { DeleteConfirmDialog } from '../delete-confirm-dialog/delete-confirm-dia
   styleUrls: ['./employee-list.component.scss'], // Styles
   standalone: true, // Standalone component
   imports: [CommonModule, FormsModule, MatTableModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, MatDialogModule, MatDividerModule, MatCardModule, MatSnackBarModule, MatProgressSpinnerModule, MatPaginatorModule], // Imported modules
-  changeDetection: ChangeDetectionStrategy.OnPush
-
 })
 export class EmployeeListComponent implements OnInit {
   public totalEmployees = 0;
@@ -88,10 +85,8 @@ export class EmployeeListComponent implements OnInit {
     const sf = sortField ?? this.sortField;
     const sd = sortDirection ?? this.sortDirection;
     const searchTerm = search ?? this.filterValue;
-    console.log('Calling getEmployees with:', { pg, pp, sf, sd, searchTerm });
     this.employeeService.getEmployees(pg, pp, sf, sd, searchTerm).subscribe({
       next: (data) => {
-        console.log('API response:', data);
         this.dataSource = data.employees;
         this.totalEmployees = data.total;
         this.currentPage = data.page;
@@ -113,11 +108,9 @@ export class EmployeeListComponent implements OnInit {
         this.loadEmployees(this.currentPage, this.pageSize, this.sortField, this.sortDirection);
       });
     }
-
   }
   // Sort event handled via (matSortChange) in template
   onSort(event: any) {
-    console.log('matSortChange event:', event);
     this.sortField = event.active;
     this.sortDirection = event.direction || 'asc';
     this.loadEmployees(this.currentPage, this.pageSize, this.sortField, this.sortDirection);
