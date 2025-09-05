@@ -117,12 +117,26 @@ def jwt_required(f):
 @app.route('/employees', methods=['GET'])
 @jwt_required
 def get_employees():
-    """
-    Get all employees (JWT protected).
-    Returns:
-        List of employees as JSON
-    """
-    employees = Employee.query.all()  # Query all employees
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
+    sort_field = request.args.get('sort', None)
+    sort_direction = request.args.get('direction', 'asc')
+    query = Employee.query
+    search = request.args.get('search', None)
+    if search:
+        search_pattern = f"%{search}%"
+        query = query.filter(
+            Employee.name.ilike(search_pattern) |
+            Employee.email.ilike(search_pattern) |
+            Employee.department.ilike(search_pattern) |
+            Employee.phone.ilike(search_pattern)
+        )
+    if sort_field in ['id', 'name', 'email', 'department', 'phone']:
+        if sort_direction == 'desc':
+            query = query.order_by(getattr(Employee, sort_field).desc())
+        else:
+            query = query.order_by(getattr(Employee, sort_field).asc())
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     result = [
         {
             'id': e.id,
@@ -130,9 +144,15 @@ def get_employees():
             'email': e.email,
             'department': e.department,
             'phone': e.phone
-        } for e in employees
+        } for e in pagination.items
     ]
-    return jsonify(result)
+    return jsonify({
+        'employees': result,
+        'total': pagination.total,
+        'page': pagination.page,
+        'pages': pagination.pages,
+        'per_page': pagination.per_page
+    })
 
 @app.route('/employees/<int:emp_id>', methods=['GET'])
 @jwt_required

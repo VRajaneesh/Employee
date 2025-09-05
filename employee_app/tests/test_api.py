@@ -5,6 +5,7 @@ Uses a separate test database and Flask test client.
 """
 import pytest
 from employee_app.app.app import app
+from employee_app.app.models.db import db
 
 def test_create_employee(client):
     """Test the POST /employees endpoint creates a new employee or returns 400 if email exists."""
@@ -39,9 +40,11 @@ def test_duplicate_employee(client):
 def client():
     """
     Pytest fixture to create a test client for the Flask app and get JWT token.
+    Uses an in-memory SQLite database to isolate test data from production.
     Automatically registers and logs in a test user, returns client and auth headers.
     """
     app.config['TESTING'] = True
+    # Database configuration and initialization are handled in conftest.py
     with app.test_client() as client:
         # Register test user (ignore if already exists)
         reg_data = {
@@ -81,7 +84,10 @@ def test_get_employees(client):
     """Test the GET /employees endpoint returns a list of employees."""
     response = client.get('/employees')
     assert response.status_code == 200
-    assert isinstance(response.get_json(), list)
+    data = response.get_json()
+    assert isinstance(data, dict)
+    assert 'employees' in data
+    assert isinstance(data['employees'], list)
 
 def test_get_employee(client):
     """Test the GET /employees/<id> endpoint returns an employee or 404."""

@@ -21,7 +21,7 @@
       </div>
     </ng-container>
     <ng-template #tableContent>
-      <table mat-table [dataSource]="dataSource" matSort #sort="matSort" class="mat-elevation-z2 employee-table">
+  <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSort($event)" #sort="matSort" class="mat-elevation-z2 employee-table">
         <!-- ID Column -->
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
@@ -64,7 +64,14 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </ng-template>
+
+    <mat-paginator
+      [length]="totalEmployees"
+      [pageSize]="pageSize"
+      [pageIndex]="currentPage - 1"
+      [pageSizeOptions]="[5, 10, 20]"
+      showFirstLastButtons>
+    </mat-paginator>
   </div>
 </mat-card>
