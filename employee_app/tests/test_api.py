@@ -5,6 +5,7 @@ Uses a separate test database and Flask test client.
 """
 import pytest
 from employee_app.app.app import app
+from employee_app.app.models.db import db
 
 def test_create_employee(client):
     """Test the POST /employees endpoint creates a new employee or returns 400 if email exists."""
@@ -44,7 +45,6 @@ def client():
     """
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    from employee_app.app.models.db import db
     with app.app_context():
         db.create_all()
     with app.test_client() as client:
