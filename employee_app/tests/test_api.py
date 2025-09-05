@@ -44,9 +44,7 @@ def client():
     Automatically registers and logs in a test user, returns client and auth headers.
     """
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    with app.app_context():
-        db.create_all()
+    # Database configuration and initialization are handled in conftest.py
     with app.test_client() as client:
         # Register test user (ignore if already exists)
         reg_data = {
