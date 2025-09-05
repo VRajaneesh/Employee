@@ -28,8 +28,18 @@ export class EmployeeService {
       });
     }
 
-  getEmployees(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl, { headers: this.getAuthHeaders() });
+  getEmployees(page: number = 1, perPage: number = 5, sortField: string = 'id', sortDirection: string = 'asc', search?: string): Observable<any> {
+    let url = `${this.apiUrl}?page=${page}&per_page=${perPage}`;
+    if (sortField) {
+      url += `&sort=${sortField}`;
+    }
+    if (sortDirection) {
+      url += `&direction=${sortDirection}`;
+    }
+    if (search) {
+      url += `&search=${encodeURIComponent(search)}`;
+    }
+    return this.http.get<any>(url, { headers: this.getAuthHeaders() });
   }
   addEmployee(employee: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, employee, { headers: this.getAuthHeaders() });

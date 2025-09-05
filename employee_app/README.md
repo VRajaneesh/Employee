@@ -33,6 +33,31 @@ This is a RESTful backend for the Employee Directory application, built with Fla
 - Flask-CORS (CORS support)
 - Docker & Docker Compose (containerized deployment)
 
+## Environment Setup
+
+Create two environment files in the backend root directory:
+
+### .env.dev (for development)
+```
+DATABASE_URL=sqlite:///employees.db
+SECRET_KEY=your_dev_secret_key
+JWT_SECRET_KEY=your_dev_jwt_secret
+JWT_EXP_DELTA_SECONDS=3600
+```
+
+### .env.prod (for production)
+```
+DATABASE_URL=sqlite:///prod_employees.db
+SECRET_KEY=your_prod_secret_key
+JWT_SECRET_KEY=your_prod_jwt_secret
+JWT_EXP_DELTA_SECONDS=3600
+```
+
+**Notes:**
+- Never commit your `.env.dev` or `.env.prod` files to source control.
+- Use strong, unique values for all secret keys in production.
+- You can use a different database engine (e.g., PostgreSQL, MySQL) by changing the `DATABASE_URL` value.
+
 ## Git Instructions
 
 Clone the repository:

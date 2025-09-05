@@ -18,6 +18,7 @@
  * - deleteEmployee(emp): Confirms and deletes the selected employee
  */
 import { Component, OnInit, ChangeDetectorRef, ViewChild, AfterViewChecked } from '@angular/core'; // Angular core imports
+import { ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router'; // For navigation
 import { EmployeeService } from '../../services/employee.service'; // Service for API calls
 import { CommonModule } from '@angular/common'; // Common Angular directives
@@ -33,24 +34,29 @@ import { MatCardModule } from '@angular/material/card'; // Material card
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // For confirmation messages
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // For loading spinner
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator'; // For pagination
-  imports: [CommonModule, FormsModule, MatTableModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, MatDialogModule, MatDividerModule, MatCardModule, MatSnackBarModule, MatProgressSpinnerModule, MatPaginatorModule] // Added MatPaginatorModule
 import { DeleteConfirmDialog } from '../delete-confirm-dialog/delete-confirm-dialog.component'; // Confirmation dialog
-
 @Component({
   selector: 'app-employee-list', // Component selector
   templateUrl: './employee-list.component.html', // HTML template
   styleUrls: ['./employee-list.component.scss'], // Styles
   standalone: true, // Standalone component
-  imports: [CommonModule, FormsModule, MatTableModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, MatDialogModule, MatDividerModule, MatCardModule, MatSnackBarModule, MatProgressSpinnerModule, MatPaginatorModule] // Imported modules
+  imports: [CommonModule, FormsModule, MatTableModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, MatDialogModule, MatDividerModule, MatCardModule, MatSnackBarModule, MatProgressSpinnerModule, MatPaginatorModule], // Imported modules
+  changeDetection: ChangeDetectionStrategy.OnPush
+
 })
-export class EmployeeListComponent implements OnInit, AfterViewChecked {
+export class EmployeeListComponent implements OnInit {
+  public totalEmployees = 0;
+  public pageSize = 5;
+  public currentPage = 1;
+  public sortField: string = 'id';
+  public sortDirection: string = 'asc';
   // List of employees fetched from API
   public employees: any[] = [];
   public isLoading: boolean = false;
   // Columns to display in the Material table
   public displayedColumns: string[] = ['id', 'name', 'email', 'department', 'phone', 'actions'];
-  // Data source for Material table
-  public dataSource = new MatTableDataSource<any>([]);
+  // Data source for Material table (plain array for server-side sorting)
+  public dataSource: any[] = [];
   // Value for search/filter input
   public filterValue: string = '';
   // Reference to MatSort for sorting table
@@ -63,52 +69,63 @@ export class EmployeeListComponent implements OnInit, AfterViewChecked {
     private cdr: ChangeDetectorRef, // For manual change detection
     private router: Router, // For navigation
     private dialog: MatDialog, // For dialogs
-  public snackBar: MatSnackBar // For confirmation messages
+    public snackBar: MatSnackBar // For confirmation messages
   ) {
     console.log('EmployeeListComponent constructor called'); // Debug log
     if (employeeService) {
       console.log('EmployeeService injected successfully'); // Debug log
-    } else {
-      console.error('EmployeeService injection failed'); // Debug log
     }
   }
 
-  // Called when component initializes
-  ngOnInit() {
+  ngOnInit(): void {
     this.isLoading = true;
-    // Restore: Fetch real employee data from API
-    this.employeeService.getEmployees().subscribe({
+    this.loadEmployees(this.currentPage, this.pageSize, this.sortField, this.sortDirection);
+  }
+
+  loadEmployees(page?: number, perPage?: number, sortField?: string, sortDirection?: string, search?: string): void {
+    const pg = page ?? this.currentPage;
+    const pp = perPage ?? this.pageSize;
+    const sf = sortField ?? this.sortField;
+    const sd = sortDirection ?? this.sortDirection;
+    const searchTerm = search ?? this.filterValue;
+    console.log('Calling getEmployees with:', { pg, pp, sf, sd, searchTerm });
+    this.employeeService.getEmployees(pg, pp, sf, sd, searchTerm).subscribe({
       next: (data) => {
-        this.employees = data;
-        this.dataSource.data = this.employees;
+        console.log('API response:', data);
+        this.dataSource = data.employees;
+        this.totalEmployees = data.total;
+        this.currentPage = data.page;
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: (err) => {
+        console.error('Error loading employees:', err);
         this.snackBar.open('Error loading employees', 'Close', { duration: 3000 });
       }
     });
   }
 
+  ngAfterViewInit(): void {
+    if (this.paginator) {
+      this.paginator.page.subscribe((event) => {
+        this.pageSize = event.pageSize;
+        this.currentPage = event.pageIndex + 1;
+        this.loadEmployees(this.currentPage, this.pageSize, this.sortField, this.sortDirection);
+      });
+    }
 
-  ngAfterViewChecked() {
-    // Assign MatSort and MatPaginator after table is rendered
-    if (this.sort && this.dataSource.sort !== this.sort) {
-      this.dataSource.sort = this.sort;
-      console.log('MatSort assigned in ngAfterViewChecked:', this.sort);
-    }
-    if (this.paginator && this.dataSource.paginator !== this.paginator) {
-      this.dataSource.paginator = this.paginator;
-      console.log('MatPaginator assigned in ngAfterViewChecked:', this.paginator);
-    }
-    if (!this.sort) {
-      console.warn('MatSort is still undefined in ngAfterViewChecked!');
-    }
+  }
+  // Sort event handled via (matSortChange) in template
+  onSort(event: any) {
+    console.log('matSortChange event:', event);
+    this.sortField = event.active;
+    this.sortDirection = event.direction || 'asc';
+    this.loadEmployees(this.currentPage, this.pageSize, this.sortField, this.sortDirection);
   }
 
   // Filter table data by search input
   applyFilter() {
-    this.dataSource.filter = this.filterValue.trim().toLowerCase();
+    this.loadEmployees(this.currentPage, this.pageSize, this.sortField, this.sortDirection, this.filterValue);
   }
 
   // Navigate to add employee form
@@ -134,8 +151,9 @@ export class EmployeeListComponent implements OnInit, AfterViewChecked {
       if (result) {
         this.employeeService.deleteEmployee(emp.id).subscribe({
           next: () => {
-            this.dataSource.data = this.dataSource.data.filter((e: any) => e.id !== emp.id); // Remove from table
+            this.dataSource = this.dataSource.filter((e: any) => e.id !== emp.id); // Remove from table
             this.snackBar.open('Employee deleted successfully!', 'Close', { duration: 3000 }); // Show confirmation
+            this.cdr.markForCheck();
           },
           error: (err) => {
             alert('Error deleting employee'); // Show error
