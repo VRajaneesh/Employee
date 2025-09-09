@@ -55,7 +55,8 @@ pipeline {
             archiveArtifacts artifacts: '**/report.html', allowEmptyArchive: true
         }
         failure {
-            mail to: 'your-team@email.com', subject: 'Jenkins Build Failed', body: 'Check Jenkins for details.'
+            echo 'Build failed'
+            // mail to: 'your-team@email.com', subject: 'Jenkins Build Failed', body: 'Check Jenkins for details.'
         }
     }
 }
