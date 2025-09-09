@@ -52,10 +52,12 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: '**/report.html', allowEmptyArchive: true
+            node {
+                archiveArtifacts artifacts: '**/report.html', allowEmptyArchive: true
+            }
         }
         failure {
-            mail to: 'your-team@email.com', subject: 'Jenkins Build Failed', body: 'Check Jenkins for details.'
+            // mail to: 'your-team@email.com', subject: 'Jenkins Build Failed', body: 'Check Jenkins for details.'
         }
     }
 }
