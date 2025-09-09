@@ -52,6 +52,7 @@ pipeline {
     }
     post {
         always {
+            echo 'Post actions completed'
             // archiveArtifacts artifacts: '**/report.html', allowEmptyArchive: true
         }
         failure {
