@@ -52,7 +52,7 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: '**/report.html', allowEmptyArchive: true
+            // archiveArtifacts artifacts: '**/report.html', allowEmptyArchive: true
         }
         failure {
             echo 'Build failed'
