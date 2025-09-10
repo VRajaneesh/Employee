@@ -58,7 +58,7 @@ jobs:
       - name: Run frontend tests
         run: |
           cd angular
-          npm run test -- --watch=false
+          npm run test -- --watch=false --browsers=ChromeHeadless
 
       - name: Build Angular app
         run: |
