@@ -6,6 +6,7 @@ Uses a separate test database and Flask test client.
 import pytest
 from employee_app.app.app import app
 from employee_app.app.models.db import db
+from unittest.mock import patch
 
 def test_create_employee(client):
     """Test the POST /employees endpoint creates a new employee or returns 400 if email exists."""
@@ -218,8 +219,11 @@ def test_expired_token_rejected():
         assert response.status_code == 401
         assert "Invalid or expired token" in response.get_json()["error"]
 
-def test_password_reset_valid():
+
+@patch('flask_mail.Mail.send')
+def test_password_reset_valid(mock_send):
     """Test /password-reset with valid token and password resets password."""
+    mock_send.return_value = None
     with app.test_client() as client:
         # Ensure user exists
         reg_data = {"name": "TestUser", "email": "testuser@example.com", "password": "oldpass123"}

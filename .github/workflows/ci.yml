@@ -36,6 +36,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+        - name: Start dummy SMTP server
+          run: |
+            python -m smtpd -c DebuggingServer -n localhost:1025 &
+
       - name: Run backend tests
         run: |
           PYTHONPATH=. pytest employee_app/tests --maxfail=1 --disable-warnings --html=employee_app/report.html
