@@ -9,6 +9,16 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      MAIL_SERVER: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USE_TLS: True
+      MAIL_USERNAME: test@example.com
+      MAIL_PASSWORD: testpassword
+      MAIL_DEFAULT_SENDER: test@example.com
+      SECRET_KEY: testsecret
+      JWT_SECRET_KEY: testjwtsecret
+      DATABASE_URL: sqlite:///test.db
 
     steps:
       - name: Checkout code
