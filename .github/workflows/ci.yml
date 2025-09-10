@@ -28,7 +28,7 @@ jobs:
 
       - name: Run backend tests
         run: |
-          PYTHONPATH=employee_app pytest employee_app/tests --maxfail=1 --disable-warnings --html=employee_app/report.html
+          PYTHONPATH=. pytest employee_app/tests --maxfail=1 --disable-warnings --html=employee_app/report.html
 
       # Frontend setup
       - name: Set up Node.js
