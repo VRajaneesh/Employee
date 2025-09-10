@@ -27,9 +27,9 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run backend tests
-          run: |
-            cd employee_app
-            PYTHONPATH=$(pwd) pytest --maxfail=1 --disable-warnings --html=report.html
+        run: |
+          cd employee_app
+          PYTHONPATH=$(pwd) pytest --maxfail=1 --disable-warnings --html=report.html
 
       # Frontend setup
       - name: Set up Node.js
