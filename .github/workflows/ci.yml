@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, bugfix/jenkins_fix ]
+    branches: [ main, bugfix/code-refacttor ]
   pull_request:
-    branches: [ main, bugfix/jenkins_fix ]
+    branches: [ main, bugfix/code-refacttor ]
 
 jobs:
   build-and-test:
