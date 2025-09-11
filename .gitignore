@@ -7,15 +7,45 @@ dist/
 # Angular
 .angular/
 coverage/
+dist
+/tmp
+/out-tsc
+/bazel-out
+/node_modules
+npm-debug.log
+yarn-error.log
+/.angular/cache
+.sass-cache
+/connect.lock
+/libpeerconnection.log
+testem.log
+/typings
 
 # Python
 __pycache__/
 *.pyc
 instance/
 .env
+.env*
+*.secret
 
 # VS Code
 .vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
 # OS files
 .DS_Store
@@ -37,3 +67,7 @@ test-results/
 
 # Ignore local settings
 local_settings.py
+
+# System files
+.DS_Store
+Thumbs.db
