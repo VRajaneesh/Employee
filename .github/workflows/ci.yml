@@ -44,6 +44,16 @@ jobs:
         run: |
           PYTHONPATH=. pytest employee_app/tests --maxfail=1 --disable-warnings --html=employee_app/report.html
 
+      - name: Run backend test coverage
+        run: |
+          PYTHONPATH=. pytest --cov=employee_app --cov-report=html employee_app/tests
+        continue-on-error: true
+      - name: Upload backend coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-coverage-report
+          path: htmlcov/
+
       # Frontend setup
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -60,6 +70,17 @@ jobs:
           cd angular
           npm run test -- --watch=false --browsers=ChromeHeadless
 
+      - name: Run frontend test coverage
+        run: |
+          cd angular
+          npm run test -- --code-coverage --watch=false --browsers=ChromeHeadless
+        continue-on-error: true
+      - name: Upload frontend coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-coverage-report
+          path: angular/coverage/
+
       - name: Build Angular app
         run: |
           cd angular
@@ -74,6 +95,13 @@ jobs:
       - name: Build Docker images
         run: |
           docker-compose build
+
+      - name: Run Docker containers
+        run: |
+          docker-compose up -d
+      - name: List running containers
+        run: |
+          docker ps
 
       # Docker push (optional, requires secrets)
       # - name: Login to DockerHub
