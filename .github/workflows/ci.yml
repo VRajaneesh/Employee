@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, bugfix/folder_refactor ]
+    branches: [ main, feature/docker_testcooverage ]
   pull_request:
-    branches: [ main, bugfix/folder_refactor ]
+    branches: [ main, bfeature/docker_testcooverage ]
 
 jobs:
   build-and-test:
