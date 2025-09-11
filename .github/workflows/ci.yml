@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, bugfix/code-refacttor ]
+    branches: [ main, bugfix/folder_refactor ]
   pull_request:
-    branches: [ main, bugfix/code-refacttor ]
+    branches: [ main, bugfix/folder_refactor ]
 
 jobs:
   build-and-test:
